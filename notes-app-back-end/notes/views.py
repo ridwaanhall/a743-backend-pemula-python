@@ -1,26 +1,25 @@
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 from notes.serializers import NoteSerializer
 from .models import Note
 
 class NoteList(APIView):
-    def post(self, request, format=None):
-        serializer = NoteSerializer(data=request.data, context={'request': request})  # Pass request context
-        if serializer.is_valid(raise_exception=True):
-            note = serializer.save()
-            return Response({
-                    "id": note.id
-            }, status=201)
+    def post(self, request):
+        note = NoteSerializer(data=request.data, context={'request': request})  # Pass request context
+        if note.is_valid(raise_exception=True):
+            note.save()
+            return Response(note.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=400)
+        return Response(note.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, format=None):
+    def get(self, request):
         notes = Note.objects.all()
         serializer = NoteSerializer(notes, many=True, context={'request': request})  # Pass request context
         return Response({
             "notes": serializer.data
-        }, status=200)
+        }, status=status.HTTP_200_OK)
 
 class NoteDetail(APIView):
     def get_object(self, pk):
@@ -29,20 +28,20 @@ class NoteDetail(APIView):
         except Note.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         note = self.get_object(pk)
         serializer = NoteSerializer(note)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request, pk):
         note = self.get_object(pk)
         serializer = NoteSerializer(note, data=request.data, context={'request': request})
         if serializer.is_valid():
-            note = serializer.save()
-            return Response({"id": note.id}, status=200)
-        return Response(serializer.errors, status=400)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request, pk):
         note = self.get_object(pk)
         note.delete()
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
