@@ -1,3 +1,3 @@
-# a743-backend-pemula-python
+# Dicoding: Belajar Back-End Pemula dengan Python
 
-Source code latihan dipisahkan berdasarkan modul. Nomor modul ada diawal nama branch, misalnya branch yang diawali angka 3 artinya modul 3.
+[learn](https://github.com/ridwaanhall/a743-backend-pemula-python/tree/learn)
