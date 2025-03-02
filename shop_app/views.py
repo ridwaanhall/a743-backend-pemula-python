@@ -19,11 +19,17 @@ class ProductList(APIView):
 
     def get(self, request):
         name = request.query_params.get('name', None)
+        location = request.query_params.get('location', None)
         products = Product.objects.filter(is_delete=False)
         
         if name:
             products = products.filter(
                 Q(name__icontains=name) | Q(location__icontains=name)
+            )
+            
+        if location:
+            products = products.filter(
+                Q(location__icontains=location) | Q(shop__icontains=location)
             )
         
         serializer = ProductResponseSerializer(
