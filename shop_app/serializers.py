@@ -12,9 +12,9 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def validate(self, data):
-        if data['price'] < 0:
+        if 'price' in data and data['price'] < 0:
             raise serializers.ValidationError("Price cannot be negative")
-        if data['stock'] < 0:
+        if 'stock' in data and data['stock'] < 0:
             raise serializers.ValidationError("Stock cannot be negative")
         return data
 
