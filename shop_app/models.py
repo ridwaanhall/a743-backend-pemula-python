@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 
 class Product(models.Model):
+    """Model to store product data with soft delete functionality."""
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=50, unique=True)
