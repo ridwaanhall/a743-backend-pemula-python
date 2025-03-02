@@ -46,9 +46,9 @@ class ProductDetail(GenericAPIView):
     lookup_field = 'pk'
 
     def get_object(self):
-        """Retrieve a product object or return 404 if not found."""
+        """Retrieve a product object or return 404 if it doesn't exist in the database."""
         try:
-            return Product.objects.get(pk=self.kwargs['pk'], is_delete=False)
+            return Product.objects.get(pk=self.kwargs['pk'])
         except Product.DoesNotExist:
             return Response(
                 {"detail": "Not found."},
