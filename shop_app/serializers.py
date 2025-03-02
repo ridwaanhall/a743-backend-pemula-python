@@ -1,7 +1,8 @@
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from .models import Product
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Product
         fields = [
@@ -9,7 +10,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'price', 'discount', 'category', 'stock', 'is_available',
             'picture', 'is_delete'
         ]
-    
+
     def validate(self, data):
         if data['price'] < 0:
             raise serializers.ValidationError("Price cannot be negative")
@@ -17,7 +18,7 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Stock cannot be negative")
         return data
 
-class ProductResponseSerializer(serializers.ModelSerializer):
+class ProductResponseSerializer(serializers.HyperlinkedModelSerializer):
     _links = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,15 +26,34 @@ class ProductResponseSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'sku', 'description', 'shop', 'location',
             'price', 'discount', 'category', 'stock', 'is_available',
-            'picture', 'is_delete', '_links'
+            'picture', 'is_delete', 'createdAt', 'updatedAt', '_links'
         ]
 
     def get__links(self, obj):
-        request = self.context['request']
-        base_url = request.build_absolute_uri('/products')
+        request = self.context.get('request')
         return [
-            {"rel": "self", "href": f"{base_url}", "action": "POST", "types": ["application/json"]},
-            {"rel": "self", "href": f"{base_url}/{obj.id}/", "action": "GET", "types": ["application/json"]},
-            {"rel": "self", "href": f"{base_url}/{obj.id}/", "action": "PUT", "types": ["application/json"]},
-            {"rel": "self", "href": f"{base_url}/{obj.id}/", "action": "DELETE", "types": ["application/json"]}
+            {
+                "rel": "self",
+                "href": reverse('product-list', request=request),
+                "action": "POST",
+                "types": ["application/json"]
+            },
+            {
+                "rel": "self",
+                "href": reverse('product-detail', kwargs={'pk': obj.pk}, request=request),
+                "action": "GET",
+                "types": ["application/json"]
+            },
+            {
+                "rel": "self",
+                "href": reverse('product-detail', kwargs={'pk': obj.pk}, request=request),
+                "action": "PUT",
+                "types": ["application/json"]
+            },
+            {
+                "rel": "self",
+                "href": reverse('product-detail', kwargs={'pk': obj.pk}, request=request),
+                "action": "DELETE",
+                "types": ["application/json"]
+            }
         ]
