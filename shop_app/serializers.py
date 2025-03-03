@@ -13,11 +13,18 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def validate(self, data):
-        """Custom validation to ensure price and stock are not negative."""
+        """Custom validation to ensure all required fields are provided and valid."""
+        required_fields = ['name', 'sku', 'description', 'shop', 'location', 'price', 'discount', 'category', 'stock', 'is_available', 'is_delete', 'picture']
+        
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            raise serializers.ValidationError({field: "This field is required." for field in missing_fields})
+
         if 'price' in data and data['price'] < 0:
             raise serializers.ValidationError("Price cannot be negative")
         if 'stock' in data and data['stock'] < 0:
             raise serializers.ValidationError("Stock cannot be negative")
+        
         return data
 
 class ProductResponseSerializer(serializers.HyperlinkedModelSerializer):
