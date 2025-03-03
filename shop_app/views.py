@@ -85,4 +85,5 @@ class ProductDetail(GenericAPIView):
             return product
         product.is_delete = True
         product.save()
+        product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
